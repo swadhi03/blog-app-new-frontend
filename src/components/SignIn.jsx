@@ -1,8 +1,14 @@
 import axios from 'axios'
 import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 const SignIn = () => {
-    const [data,changeData]=useState([])
+
+    const navigate = useNavigate()
+
+    const [data,changeData]=useState(
+    {"email":"","password":""}
+)
     const inputHandler=(event)=>{
         changeData({...data,[event.target.name]:event.target.value})
     }
@@ -11,12 +17,25 @@ const SignIn = () => {
         axios.post("http://localhost:8080/signin",data).then(
             (response)=>{
                 console.log(response.data)
-                if(response.data.status=="success")
+                if(response.data.status=="Incorrect Password")
                     {
-                        alert("success")
+                        alert("Incorrect Password")
                     }
-                    else{
-                        alert("failed")
+                    else if(response.data.status=="Invalid Email Id")
+                    {
+                        alert("Invalid Email Id")
+                    }
+                    else
+                    {
+                        let token = response.data.token
+                        let userId = response.data.userId
+
+                        console.log(token)
+                        console.log(userId)
+                        sessionStorage.setItem("userId",userId)
+                        sessionStorage.setItem("token",token)
+
+                        navigate("/create")
                     }
             }
         ).catch(
@@ -43,8 +62,10 @@ const SignIn = () => {
                         <div className="col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                             <button className="btn btn-success" onClick={readValue}>Sign In</button>
                         </div>
+                        <div>
+                            <Link to="/signup" className='btn btn-primary'>Existing User</Link>
+                        </div>
                     </div>
-                    <a href="/">already signed in Click Here</a>
                 </div>
             </div>
         </div>
